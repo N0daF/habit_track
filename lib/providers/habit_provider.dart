@@ -18,54 +18,39 @@ class HabitProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addHabit(String name, int color, double goal, String detail, String unit) async {
+  Future<void> addHabit(String name, int color, double goal, String detail, String unit, String icon) async {
     final habit = Habit(
       name: name,
-      progress: 0.0,
       color: color,
       goal: goal,
       detail: detail,
       unit: unit,
+      icon: icon,
     );
     await DatabaseHelper.instance.insertHabit(habit);
     await fetchHabits();
   }
 
-  Future<void> updateProgress(int id, double increment) async {
-    final habit = _habits.firstWhere((h) => h.id == id);
-    double newProgress = habit.progress + increment;
-    if (newProgress > habit.goal) newProgress = habit.goal;
-    final updatedHabit = Habit(
-      id: habit.id,
-      name: habit.name,
-      progress: newProgress,
-      color: habit.color,
-      goal: habit.goal,
-      detail: habit.detail,
-      unit: habit.unit,
-    );
-    await DatabaseHelper.instance.updateHabit(updatedHabit);
-
+  Future<void> updateProgress(int id, double increment, DateTime selectedDate) async {
     final history = HabitHistory(
       habitId: id,
-      date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+      date: DateFormat('yyyy-MM-dd').format(selectedDate),
       progressAdded: increment,
     );
     await DatabaseHelper.instance.insertHabitHistory(history);
-
-    await fetchHabits();
+    notifyListeners();
   }
 
-  Future<void> editHabit(int id, String newName, int newColor, double newGoal, String newDetail, String newUnit) async {
+  Future<void> editHabit(int id, String newName, int newColor, double newGoal, String newDetail, String newUnit, String newIcon) async {
     final habit = _habits.firstWhere((h) => h.id == id);
     final updatedHabit = Habit(
       id: habit.id,
       name: newName,
-      progress: habit.progress,
       color: newColor,
       goal: newGoal,
       detail: newDetail,
       unit: newUnit,
+      icon: newIcon,
     );
     await DatabaseHelper.instance.updateHabit(updatedHabit);
     await fetchHabits();
@@ -78,5 +63,13 @@ class HabitProvider with ChangeNotifier {
 
   Future<List<HabitHistory>> getHabitHistory(int habitId) async {
     return await DatabaseHelper.instance.getHabitHistory(habitId);
+  }
+
+  Future<double> getProgressForDate(int habitId, DateTime date) async {
+    final List<HabitHistory> history = await getHabitHistory(habitId);
+    final dateString = DateFormat('yyyy-MM-dd').format(date);
+    final List<HabitHistory> dayHistory = history.where((h) => h.date == dateString).toList();
+    final double totalProgress = dayHistory.fold<double>(0.0, (double sum, HabitHistory h) => sum + h.progressAdded);
+    return totalProgress;
   }
 }

@@ -12,12 +12,25 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
   final TextEditingController _goalController = TextEditingController();
   final TextEditingController _detailController = TextEditingController();
   final TextEditingController _unitController = TextEditingController();
-  int _selectedColor = Colors.red.value;
+  Color _selectedColor = Colors.blue;
+  String _selectedIcon = 'check_circle'; // ไอคอนเริ่มต้น
 
-  final List<Map<String, dynamic>> _priorityColors = [
-    {'name': 'High (Red)', 'color': Colors.red.value},
-    {'name': 'Medium (Yellow)', 'color': Colors.yellow.value},
-    {'name': 'Low (Green)', 'color': Colors.green.value},
+  final List<Map<String, dynamic>> _colors = [
+    {'color': Colors.orange},
+    {'color': Colors.green},
+    {'color': Colors.blue},
+    {'color': Colors.purple},
+    {'color': Colors.red},
+    {'color': Colors.yellow},
+  ];
+
+  final List<Map<String, dynamic>> _icons = [
+    {'name': 'check_circle', 'icon': Icons.check_circle},
+    {'name': 'water_drop', 'icon': Icons.water_drop},
+    {'name': 'book', 'icon': Icons.book},
+    {'name': 'fitness_center', 'icon': Icons.fitness_center},
+    {'name': 'bed', 'icon': Icons.bed},
+    {'name': 'lightbulb', 'icon': Icons.lightbulb},
   ];
 
   @override
@@ -25,97 +38,195 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
     final habitProvider = Provider.of<HabitProvider>(context, listen: false);
 
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text('Add New Habit'),
+        title: Text('Create Habit'),
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        elevation: 1,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: _nameController,
+              style: TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                labelText: 'Habit Name (e.g., Drinkwater)',
+                labelText: 'Habit Name (e.g., Read)',
+                labelStyle: TextStyle(color: Colors.grey),
                 border: OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
               ),
+            ),
+            SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _goalController,
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: 'Goal',
+                      labelStyle: TextStyle(color: Colors.grey),
+                      border: OutlineInputBorder(),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    controller: _unitController,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      labelText: 'Unit (e.g., Pages)',
+                      labelStyle: TextStyle(color: Colors.grey),
+                      border: OutlineInputBorder(),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.grey),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Text('Color', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+            SizedBox(height: 10),
+            Row(
+              children: _colors.map((colorOption) {
+                final color = colorOption['color'] as Color;
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedColor = color;
+                    });
+                  },
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: _selectedColor == color ? Colors.white : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 20),
+            Text('Icon', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+            SizedBox(height: 10),
+            Row(
+              children: _icons.map((iconOption) {
+                final iconName = iconOption['name'] as String;
+                final icon = iconOption['icon'] as IconData;
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedIcon = iconName;
+                    });
+                  },
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 5),
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: _selectedIcon == iconName ? Colors.grey[700] : Colors.grey[900],
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: _selectedIcon == iconName ? Colors.white : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                    child: Icon(
+                      icon,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
             SizedBox(height: 20),
             TextField(
               controller: _detailController,
+              style: TextStyle(color: Colors.white),
               decoration: InputDecoration(
-                labelText: 'Detail (e.g., drink water)',
+                labelText: 'Description (e.g., A lifelong learner)',
+                labelStyle: TextStyle(color: Colors.grey),
                 border: OutlineInputBorder(),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
               ),
             ),
             SizedBox(height: 20),
-            TextField(
-              controller: _goalController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Goal (e.g., 800)',
-                border: OutlineInputBorder(),
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton(
+                onPressed: () async {
+                  if (_nameController.text.isNotEmpty &&
+                      _goalController.text.isNotEmpty &&
+                      _detailController.text.isNotEmpty &&
+                      _unitController.text.isNotEmpty) {
+                    final goal = double.parse(_goalController.text);
+                    await habitProvider.addHabit(
+                      _nameController.text,
+                      _selectedColor.value,
+                      goal,
+                      _detailController.text,
+                      _unitController.text,
+                      _selectedIcon, // ส่งค่า icon
+                    );
+                    Navigator.pop(context);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Please fill all fields')),
+                    );
+                  }
+                },
+                child: Text('CREATE'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: _unitController,
-              decoration: InputDecoration(
-                labelText: 'Unit (e.g., ml)',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 20),
-            DropdownButtonFormField<int>(
-              value: _selectedColor,
-              decoration: InputDecoration(
-                labelText: 'Priority Color',
-                border: OutlineInputBorder(),
-              ),
-              items: _priorityColors.map((colorOption) {
-                return DropdownMenuItem<int>(
-                  value: colorOption['color'],
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 20,
-                        height: 20,
-                        color: Color(colorOption['color']),
-                      ),
-                      SizedBox(width: 10),
-                      Text(colorOption['name']),
-                    ],
-                  ),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedColor = value!;
-                });
-              },
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                if (_nameController.text.isNotEmpty &&
-                    _goalController.text.isNotEmpty &&
-                    _detailController.text.isNotEmpty &&
-                    _unitController.text.isNotEmpty) {
-                  final goal = double.parse(_goalController.text);
-                  habitProvider.addHabit(
-                    _nameController.text,
-                    _selectedColor,
-                    goal,
-                    _detailController.text,
-                    _unitController.text,
-                  );
-                  Navigator.pop(context);
-                }
-              },
-              child: Text('Add Habit'),
             ),
           ],
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _goalController.dispose();
+    _detailController.dispose();
+    _unitController.dispose();
+    super.dispose();
   }
 }

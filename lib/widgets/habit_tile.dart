@@ -2,173 +2,185 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/habit.dart';
 import '../providers/habit_provider.dart';
+import '../screens/edit_habit_screen.dart';
+import 'package:intl/intl.dart';
 
 class HabitTile extends StatelessWidget {
   final Habit habit;
+  final DateTime selectedDate;
 
-  HabitTile({required this.habit});
+  HabitTile({required this.habit, required this.selectedDate});
+
+  // ฟังก์ชันแปลง String เป็น IconData
+  IconData _getIconData(String iconName) {
+    switch (iconName) {
+      case 'water_drop':
+        return Icons.water_drop;
+      case 'book':
+        return Icons.book;
+      case 'fitness_center':
+        return Icons.fitness_center;
+      case 'bed':
+        return Icons.bed;
+      case 'lightbulb':
+        return Icons.lightbulb;
+      case 'check_circle':
+      default:
+        return Icons.check_circle;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final habitProvider = Provider.of<HabitProvider>(context, listen: false);
-    final TextEditingController _progressController = TextEditingController();
-
-    final double progressPercentage = (habit.progress / habit.goal * 100).clamp(0, 100);
 
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      color: Color(habit.color).withOpacity(0.2),
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ListTile(
-        title: Text(
-          habit.name,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '${habit.detail} ${habit.goal.toStringAsFixed(0)} ${habit.unit}',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.black54,
-              ),
-            ),
-            SizedBox(height: 4),
-            Text(
-              'Progress: ${progressPercentage.toStringAsFixed(0)} / 100%',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.black54,
-              ),
-            ),
-          ],
-        ),
-        leading: Container(
-          width: 10,
-          decoration: BoxDecoration(
-            color: Color(habit.color),
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(12),
-              bottomLeft: Radius.circular(12),
-            ),
-          ),
-        ),
-        trailing: SizedBox(
-          width: 200,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+  color: Color(habit.color),
+  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  child: Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: FutureBuilder<double>(
+      future: habitProvider.getProgressForDate(habit.id!, selectedDate),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Row(
             children: [
-              IconButton(
-                icon: Icon(Icons.history, color: Colors.purple),
-                onPressed: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/habit-history',
-                    arguments: habit,
-                  );
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.add_circle, color: Colors.green),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text('Add Progress'),
-                      content: TextField(
-                        controller: _progressController,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          labelText: 'Enter progress (e.g., 200 ${habit.unit})',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            if (_progressController.text.isNotEmpty) {
-                              final increment = double.parse(_progressController.text);
-                              habitProvider.updateProgress(habit.id!, increment);
-                              Navigator.pop(context);
-                            }
-                          },
-                          child: Text('Add'),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.edit, color: Colors.blue),
-                onPressed: () async {
-                  await Navigator.pushNamed(
-                    context,
-                    '/edit-habit',
-                    arguments: habit,
-                  );
-                  habitProvider.fetchHabits();
-                },
-              ),
-              IconButton(
-                icon: Icon(Icons.delete, color: Colors.red),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text(
-                        'Confirm Delete',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      content: Text(
-                        'Are you sure you want to delete "${habit.name}"?',
-                        style: TextStyle(color: Colors.black54),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            habitProvider.deleteHabit(habit.id!);
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            'Delete',
-                            style: TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 16),
+              Text(
+                habit.name,
+                style: TextStyle(color: Colors.white),  // เปลี่ยนเป็นสีขาว
               ),
             ],
-          ),
-        ),
-      ),
-    );
+          );
+        }
+        final progress = snapshot.data ?? 0.0;
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // เปลี่ยนสีของ Icon ให้เป็นสีขาว
+            Icon(
+              _getIconData(habit.icon),
+              color: Colors.white,  // เปลี่ยนเป็นสีขาว
+              size: 40,
+            ),
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // เปลี่ยนสีตัวหนังสือให้เป็นสีขาว
+                  Text(
+                    habit.name,
+                    style: TextStyle(
+                      color: Colors.white,  // เปลี่ยนเป็นสีขาว
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    habit.detail,
+                    style: TextStyle(
+                      color: Colors.white,  // เปลี่ยนเป็นสีขาว
+                      fontSize: 14,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Goal: ${habit.goal} ${habit.unit} (Current: ${progress.toStringAsFixed(1)})',
+                    style: TextStyle(
+                      color: Colors.white,  // เปลี่ยนเป็นสีขาว
+                      fontSize: 14,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  LinearProgressIndicator(
+                    value: progress / habit.goal,
+                    backgroundColor: Colors.grey[900],
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),  
+                    minHeight: 8,
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.add, color: Colors.white),  
+                  onPressed: () async {
+                    final TextEditingController progressController = TextEditingController();
+                    await showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          backgroundColor: Colors.grey[900],
+                          title: Text('Add Progress', style: TextStyle(color: Colors.white)),
+                          content: TextField(
+                            controller: progressController,
+                            keyboardType: TextInputType.number,
+                            style: TextStyle(color: Colors.white),  
+                            decoration: InputDecoration(
+                              labelText: 'Enter Progress',
+                              labelStyle: TextStyle(color: Colors.grey),
+                              border: OutlineInputBorder(),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text('Cancel', style: TextStyle(color: Colors.white)),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                if (progressController.text.isNotEmpty) {
+                                  final increment = double.parse(progressController.text);
+                                  await habitProvider.updateProgress(habit.id!, increment, selectedDate);
+                                  Navigator.pop(context);
+                                  (context as Element).markNeedsBuild();
+                                }
+                              },
+                              child: Text('Add', style: TextStyle(color: Colors.white)),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.edit, color: Colors.white),  
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/edit-habit',
+                      arguments: habit,
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.delete, color: Colors.white),  
+                  onPressed: () async {
+                    await habitProvider.deleteHabit(habit.id!);
+                  },
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    ),
+  ),
+);
   }
 }
