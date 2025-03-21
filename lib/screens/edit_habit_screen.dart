@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/habit.dart';
 import '../providers/habit_provider.dart';
 
-class AddHabitScreen extends StatefulWidget {
+class EditHabitScreen extends StatefulWidget {
   @override
-  _AddHabitScreenState createState() => _AddHabitScreenState();
+  _EditHabitScreenState createState() => _EditHabitScreenState();
 }
 
-class _AddHabitScreenState extends State<AddHabitScreen> {
-  final TextEditingController _controller = TextEditingController();
-  int _selectedColor = Colors.red.value; // ค่าเริ่มต้นเป็นสีแดง
+class _EditHabitScreenState extends State<EditHabitScreen> {
+  late TextEditingController _controller;
+  late int _selectedColor;
 
   final List<Map<String, dynamic>> _priorityColors = [
     {'name': 'High (Red)', 'color': Colors.red.value},
@@ -18,13 +19,20 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    final Habit habit = ModalRoute.of(context)!.settings.arguments as Habit;
+    _controller = TextEditingController(text: habit.name);
+    _selectedColor = habit.color;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final habitProvider = Provider.of<HabitProvider>(context, listen: false);
+    final Habit habit = ModalRoute.of(context)!.settings.arguments as Habit;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Add New Habit'),
-      ),
+      appBar: AppBar(title: Text('Edit Habit')),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -32,7 +40,7 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
             TextField(
               controller: _controller,
               decoration: InputDecoration(
-                labelText: 'Habit Name (e.g., Drink Water)',
+                labelText: 'Habit Name',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -43,22 +51,23 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
                 labelText: 'Priority Color',
                 border: OutlineInputBorder(),
               ),
-              items: _priorityColors.map((colorOption) {
-                return DropdownMenuItem<int>(
-                  value: colorOption['color'],
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 20,
-                        height: 20,
-                        color: Color(colorOption['color']),
+              items:
+                  _priorityColors.map((colorOption) {
+                    return DropdownMenuItem<int>(
+                      value: colorOption['color'],
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 20,
+                            height: 20,
+                            color: Color(colorOption['color']),
+                          ),
+                          SizedBox(width: 10),
+                          Text(colorOption['name']),
+                        ],
                       ),
-                      SizedBox(width: 10),
-                      Text(colorOption['name']),
-                    ],
-                  ),
-                );
-              }).toList(),
+                    );
+                  }).toList(),
               onChanged: (value) {
                 setState(() {
                   _selectedColor = value!;
@@ -69,11 +78,15 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
             ElevatedButton(
               onPressed: () {
                 if (_controller.text.isNotEmpty) {
-                  habitProvider.addHabit(_controller.text, _selectedColor);
+                  habitProvider.editHabit(
+                    habit.id!,
+                    _controller.text,
+                    _selectedColor,
+                  );
                   Navigator.pop(context);
                 }
               },
-              child: Text('Add Habit'),
+              child: Text('Save Changes'),
             ),
           ],
         ),

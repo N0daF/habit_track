@@ -25,7 +25,8 @@ class DatabaseHelper {
       CREATE TABLE habits (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        progress REAL NOT NULL
+        progress REAL NOT NULL,
+        color INTEGER NOT NULL
       )
     ''');
   }
@@ -48,6 +49,15 @@ class DatabaseHelper {
       habit.toMap(),
       where: 'id = ?',
       whereArgs: [habit.id],
+    );
+  }
+
+  Future<void> deleteHabit(int id) async {
+    final db = await database;
+    await db.delete(
+      'habits',
+      where: 'id = ?',
+      whereArgs: [id],
     );
   }
 }

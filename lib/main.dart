@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/add_habit_screen.dart';
+import 'screens/edit_habit_screen.dart'; // เพิ่ม import
 import 'providers/habit_provider.dart';
 
 void main() {
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => HomeScreen(),
         '/add-habit': (context) => AddHabitScreen(),
+        '/edit-habit': (context) => EditHabitScreen(), // เพิ่มเส้นทางใหม่
       },
     );
   }

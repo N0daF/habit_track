@@ -16,16 +16,28 @@ class HabitProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addHabit(String name) async {
-    final habit = Habit(name: name, progress: 0.0);
+  Future<void> addHabit(String name, int color) async { // เพิ่ม color
+    final habit = Habit(name: name, progress: 0.0, color: color);
     await DatabaseHelper.instance.insertHabit(habit);
     await fetchHabits();
   }
 
   Future<void> updateProgress(int id, double progress) async {
     final habit = _habits.firstWhere((h) => h.id == id);
-    final updatedHabit = Habit(id: habit.id, name: habit.name, progress: progress);
+    final updatedHabit = Habit(id: habit.id, name: habit.name, progress: progress, color: habit.color);
     await DatabaseHelper.instance.updateHabit(updatedHabit);
+    await fetchHabits();
+  }
+
+  Future<void> editHabit(int id, String newName, int newColor) async { // เพิ่ม newColor
+    final habit = _habits.firstWhere((h) => h.id == id);
+    final updatedHabit = Habit(id: habit.id, name: newName, progress: habit.progress, color: newColor);
+    await DatabaseHelper.instance.updateHabit(updatedHabit);
+    await fetchHabits();
+  }
+
+  Future<void> deleteHabit(int id) async {
+    await DatabaseHelper.instance.deleteHabit(id);
     await fetchHabits();
   }
 }
