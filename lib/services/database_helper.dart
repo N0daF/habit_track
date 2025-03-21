@@ -1,6 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/habit.dart';
+import '../models/habit_history.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -30,6 +31,15 @@ class DatabaseHelper {
         goal REAL NOT NULL,
         detail TEXT NOT NULL,
         unit TEXT NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE habit_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        habitId INTEGER NOT NULL,
+        date TEXT NOT NULL,
+        progressAdded REAL NOT NULL,
+        FOREIGN KEY (habitId) REFERENCES habits(id)
       )
     ''');
   }
@@ -62,5 +72,25 @@ class DatabaseHelper {
       where: 'id = ?',
       whereArgs: [id],
     );
+    await db.delete(
+      'habit_history',
+      where: 'habitId = ?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> insertHabitHistory(HabitHistory history) async {
+    final db = await database;
+    await db.insert('habit_history', history.toMap());
+  }
+
+  Future<List<HabitHistory>> getHabitHistory(int habitId) async {
+    final db = await database;
+    final result = await db.query(
+      'habit_history',
+      where: 'habitId = ?',
+      whereArgs: [habitId],
+    );
+    return result.map((json) => HabitHistory.fromMap(json)).toList();
   }
 }

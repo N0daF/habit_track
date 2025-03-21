@@ -13,7 +13,6 @@ class HabitTile extends StatelessWidget {
     final habitProvider = Provider.of<HabitProvider>(context, listen: false);
     final TextEditingController _progressController = TextEditingController();
 
-    // คำนวณเปอร์เซ็นต์ Progress
     final double progressPercentage = (habit.progress / habit.goal * 100).clamp(0, 100);
 
     return Card(
@@ -63,10 +62,20 @@ class HabitTile extends StatelessWidget {
           ),
         ),
         trailing: SizedBox(
-          width: 150,
+          width: 200,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              IconButton(
+                icon: Icon(Icons.history, color: Colors.purple),
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/habit-history',
+                    arguments: habit,
+                  );
+                },
+              ),
               IconButton(
                 icon: Icon(Icons.add_circle, color: Colors.green),
                 onPressed: () {
@@ -104,12 +113,13 @@ class HabitTile extends StatelessWidget {
               ),
               IconButton(
                 icon: Icon(Icons.edit, color: Colors.blue),
-                onPressed: () {
-                  Navigator.pushNamed(
+                onPressed: () async {
+                  await Navigator.pushNamed(
                     context,
                     '/edit-habit',
                     arguments: habit,
                   );
+                  habitProvider.fetchHabits();
                 },
               ),
               IconButton(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/habit.dart';
+import '../models/habit_history.dart';
 import '../services/database_helper.dart';
+import 'package:intl/intl.dart';
 
 class HabitProvider with ChangeNotifier {
   List<Habit> _habits = [];
@@ -43,6 +45,14 @@ class HabitProvider with ChangeNotifier {
       unit: habit.unit,
     );
     await DatabaseHelper.instance.updateHabit(updatedHabit);
+
+    final history = HabitHistory(
+      habitId: id,
+      date: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+      progressAdded: increment,
+    );
+    await DatabaseHelper.instance.insertHabitHistory(history);
+
     await fetchHabits();
   }
 
@@ -64,5 +74,9 @@ class HabitProvider with ChangeNotifier {
   Future<void> deleteHabit(int id) async {
     await DatabaseHelper.instance.deleteHabit(id);
     await fetchHabits();
+  }
+
+  Future<List<HabitHistory>> getHabitHistory(int habitId) async {
+    return await DatabaseHelper.instance.getHabitHistory(habitId);
   }
 }

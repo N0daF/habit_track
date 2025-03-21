@@ -3,7 +3,18 @@ import 'package:provider/provider.dart';
 import '../providers/habit_provider.dart';
 import '../widgets/habit_tile.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<HabitProvider>(context, listen: false).fetchHabits();
+  }
+
   @override
   Widget build(BuildContext context) {
     final habitProvider = Provider.of<HabitProvider>(context);
@@ -21,8 +32,9 @@ class HomeScreen extends StatelessWidget {
               },
             ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, '/add-habit');
+        onPressed: () async {
+          await Navigator.pushNamed(context, '/add-habit');
+          habitProvider.fetchHabits();
         },
         child: Icon(Icons.add),
       ),

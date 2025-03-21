@@ -11,10 +11,9 @@ class EditHabitScreen extends StatefulWidget {
 class _EditHabitScreenState extends State<EditHabitScreen> {
   late TextEditingController _nameController;
   late TextEditingController _goalController;
-  late TextEditingController
-  _detailController; // แก้ไขจาก _detail控制器 เป็น _detailController
+  late TextEditingController _detailController;
   late TextEditingController _unitController;
-  late int _selectedColor;
+  int? _selectedColor;
 
   final List<Map<String, dynamic>> _priorityColors = [
     {'name': 'High (Red)', 'color': Colors.red.value},
@@ -27,7 +26,7 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
     super.initState();
     _nameController = TextEditingController();
     _goalController = TextEditingController();
-    _detailController = TextEditingController(); // ใช้ชื่อที่ถูกต้อง
+    _detailController = TextEditingController();
     _unitController = TextEditingController();
   }
 
@@ -37,9 +36,11 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
     final Habit habit = ModalRoute.of(context)!.settings.arguments as Habit;
     _nameController.text = habit.name;
     _goalController.text = habit.goal.toString();
-    _detailController.text = habit.detail; // ใช้ชื่อที่ถูกต้อง
+    _detailController.text = habit.detail;
     _unitController.text = habit.unit;
-    _selectedColor = habit.color;
+    if (_selectedColor == null) {
+      _selectedColor = habit.color;
+    }
   }
 
   @override
@@ -48,7 +49,9 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
     final Habit habit = ModalRoute.of(context)!.settings.arguments as Habit;
 
     return Scaffold(
-      appBar: AppBar(title: Text('Edit Habit')),
+      appBar: AppBar(
+        title: Text('Edit Habit: ${habit.name}'),
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
@@ -62,7 +65,7 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
             ),
             SizedBox(height: 20),
             TextField(
-              controller: _detailController, // ใช้ชื่อที่ถูกต้อง
+              controller: _detailController,
               decoration: InputDecoration(
                 labelText: 'Detail',
                 border: OutlineInputBorder(),
@@ -92,46 +95,52 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
                 labelText: 'Priority Color',
                 border: OutlineInputBorder(),
               ),
-              items:
-                  _priorityColors.map((colorOption) {
-                    return DropdownMenuItem<int>(
-                      value: colorOption['color'],
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 20,
-                            height: 20,
-                            color: Color(colorOption['color']),
-                          ),
-                          SizedBox(width: 10),
-                          Text(colorOption['name']),
-                        ],
+              items: _priorityColors.map((colorOption) {
+                return DropdownMenuItem<int>(
+                  value: colorOption['color'],
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 20,
+                        height: 20,
+                        color: Color(colorOption['color']),
                       ),
-                    );
-                  }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedColor = value!;
-                });
+                      SizedBox(width: 10),
+                      Text(colorOption['name']),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: (int? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    _selectedColor = newValue;
+                  });
+                }
               },
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_nameController.text.isNotEmpty &&
                     _goalController.text.isNotEmpty &&
                     _detailController.text.isNotEmpty &&
-                    _unitController.text.isNotEmpty) {
+                    _unitController.text.isNotEmpty &&
+                    _selectedColor != null) {
                   final goal = double.parse(_goalController.text);
-                  habitProvider.editHabit(
+                  await habitProvider.editHabit(
                     habit.id!,
                     _nameController.text,
-                    _selectedColor,
+                    _selectedColor!,
                     goal,
                     _detailController.text,
                     _unitController.text,
                   );
-                  Navigator.pop(context);
+                  Navigator.pop(context); // ลบการแจ้งเตือน "Habit updated successfully!"
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Please fill all fields and select a color')),
+                  );
                 }
               },
               child: Text('Save Changes'),
@@ -146,7 +155,7 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
   void dispose() {
     _nameController.dispose();
     _goalController.dispose();
-    _detailController.dispose(); // ใช้ชื่อที่ถูกต้อง
+    _detailController.dispose();
     _unitController.dispose();
     super.dispose();
   }
