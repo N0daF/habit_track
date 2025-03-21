@@ -2,13 +2,19 @@ class Habit {
   final int? id;
   final String name;
   final double progress;
-  final int color; // เพิ่มฟิลด์สำหรับสี
+  final int color;
+  final double goal;
+  final String detail; // รายละเอียดของ Habit
+  final String unit;   // หน่วยของ Goal
 
   Habit({
     this.id,
     required this.name,
     required this.progress,
     required this.color,
+    required this.goal,
+    required this.detail,
+    required this.unit,
   });
 
   Map<String, dynamic> toMap() {
@@ -17,6 +23,9 @@ class Habit {
       'name': name,
       'progress': progress,
       'color': color,
+      'goal': goal,
+      'detail': detail,
+      'unit': unit,
     };
   }
 
@@ -26,6 +35,9 @@ class Habit {
       name: map['name'],
       progress: map['progress'],
       color: map['color'],
+      goal: map['goal'],
+      detail: map['detail'],
+      unit: map['unit'],
     );
   }
 }

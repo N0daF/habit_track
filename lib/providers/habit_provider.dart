@@ -16,22 +16,47 @@ class HabitProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addHabit(String name, int color) async { // เพิ่ม color
-    final habit = Habit(name: name, progress: 0.0, color: color);
+  Future<void> addHabit(String name, int color, double goal, String detail, String unit) async {
+    final habit = Habit(
+      name: name,
+      progress: 0.0,
+      color: color,
+      goal: goal,
+      detail: detail,
+      unit: unit,
+    );
     await DatabaseHelper.instance.insertHabit(habit);
     await fetchHabits();
   }
 
-  Future<void> updateProgress(int id, double progress) async {
+  Future<void> updateProgress(int id, double increment) async {
     final habit = _habits.firstWhere((h) => h.id == id);
-    final updatedHabit = Habit(id: habit.id, name: habit.name, progress: progress, color: habit.color);
+    double newProgress = habit.progress + increment;
+    if (newProgress > habit.goal) newProgress = habit.goal;
+    final updatedHabit = Habit(
+      id: habit.id,
+      name: habit.name,
+      progress: newProgress,
+      color: habit.color,
+      goal: habit.goal,
+      detail: habit.detail,
+      unit: habit.unit,
+    );
     await DatabaseHelper.instance.updateHabit(updatedHabit);
     await fetchHabits();
   }
 
-  Future<void> editHabit(int id, String newName, int newColor) async { // เพิ่ม newColor
+  Future<void> editHabit(int id, String newName, int newColor, double newGoal, String newDetail, String newUnit) async {
     final habit = _habits.firstWhere((h) => h.id == id);
-    final updatedHabit = Habit(id: habit.id, name: newName, progress: habit.progress, color: newColor);
+    final updatedHabit = Habit(
+      id: habit.id,
+      name: newName,
+      progress: habit.progress,
+      color: newColor,
+      goal: newGoal,
+      detail: newDetail,
+      unit: newUnit,
+    );
     await DatabaseHelper.instance.updateHabit(updatedHabit);
     await fetchHabits();
   }

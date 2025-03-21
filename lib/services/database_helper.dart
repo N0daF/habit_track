@@ -26,7 +26,10 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         progress REAL NOT NULL,
-        color INTEGER NOT NULL
+        color INTEGER NOT NULL,
+        goal REAL NOT NULL,
+        detail TEXT NOT NULL,
+        unit TEXT NOT NULL
       )
     ''');
   }

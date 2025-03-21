@@ -8,8 +8,11 @@ class AddHabitScreen extends StatefulWidget {
 }
 
 class _AddHabitScreenState extends State<AddHabitScreen> {
-  final TextEditingController _controller = TextEditingController();
-  int _selectedColor = Colors.red.value; // ค่าเริ่มต้นเป็นสีแดง
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _goalController = TextEditingController();
+  final TextEditingController _detailController = TextEditingController();
+  final TextEditingController _unitController = TextEditingController();
+  int _selectedColor = Colors.red.value;
 
   final List<Map<String, dynamic>> _priorityColors = [
     {'name': 'High (Red)', 'color': Colors.red.value},
@@ -25,14 +28,39 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
       appBar: AppBar(
         title: Text('Add New Habit'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
-              controller: _controller,
+              controller: _nameController,
               decoration: InputDecoration(
-                labelText: 'Habit Name (e.g., Drink Water)',
+                labelText: 'Habit Name (e.g., Drinkwater)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 20),
+            TextField(
+              controller: _detailController,
+              decoration: InputDecoration(
+                labelText: 'Detail (e.g., drink water)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 20),
+            TextField(
+              controller: _goalController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Goal (e.g., 800)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 20),
+            TextField(
+              controller: _unitController,
+              decoration: InputDecoration(
+                labelText: 'Unit (e.g., ml)',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -68,8 +96,18 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                if (_controller.text.isNotEmpty) {
-                  habitProvider.addHabit(_controller.text, _selectedColor);
+                if (_nameController.text.isNotEmpty &&
+                    _goalController.text.isNotEmpty &&
+                    _detailController.text.isNotEmpty &&
+                    _unitController.text.isNotEmpty) {
+                  final goal = double.parse(_goalController.text);
+                  habitProvider.addHabit(
+                    _nameController.text,
+                    _selectedColor,
+                    goal,
+                    _detailController.text,
+                    _unitController.text,
+                  );
                   Navigator.pop(context);
                 }
               },

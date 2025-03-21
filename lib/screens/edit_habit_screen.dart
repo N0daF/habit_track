@@ -9,7 +9,11 @@ class EditHabitScreen extends StatefulWidget {
 }
 
 class _EditHabitScreenState extends State<EditHabitScreen> {
-  late TextEditingController _controller;
+  late TextEditingController _nameController;
+  late TextEditingController _goalController;
+  late TextEditingController
+  _detailController; // แก้ไขจาก _detail控制器 เป็น _detailController
+  late TextEditingController _unitController;
   late int _selectedColor;
 
   final List<Map<String, dynamic>> _priorityColors = [
@@ -21,8 +25,20 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
   @override
   void initState() {
     super.initState();
+    _nameController = TextEditingController();
+    _goalController = TextEditingController();
+    _detailController = TextEditingController(); // ใช้ชื่อที่ถูกต้อง
+    _unitController = TextEditingController();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     final Habit habit = ModalRoute.of(context)!.settings.arguments as Habit;
-    _controller = TextEditingController(text: habit.name);
+    _nameController.text = habit.name;
+    _goalController.text = habit.goal.toString();
+    _detailController.text = habit.detail; // ใช้ชื่อที่ถูกต้อง
+    _unitController.text = habit.unit;
     _selectedColor = habit.color;
   }
 
@@ -33,14 +49,39 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text('Edit Habit')),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
-              controller: _controller,
+              controller: _nameController,
               decoration: InputDecoration(
                 labelText: 'Habit Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 20),
+            TextField(
+              controller: _detailController, // ใช้ชื่อที่ถูกต้อง
+              decoration: InputDecoration(
+                labelText: 'Detail',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 20),
+            TextField(
+              controller: _goalController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Goal',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 20),
+            TextField(
+              controller: _unitController,
+              decoration: InputDecoration(
+                labelText: 'Unit',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -77,11 +118,18 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                if (_controller.text.isNotEmpty) {
+                if (_nameController.text.isNotEmpty &&
+                    _goalController.text.isNotEmpty &&
+                    _detailController.text.isNotEmpty &&
+                    _unitController.text.isNotEmpty) {
+                  final goal = double.parse(_goalController.text);
                   habitProvider.editHabit(
                     habit.id!,
-                    _controller.text,
+                    _nameController.text,
                     _selectedColor,
+                    goal,
+                    _detailController.text,
+                    _unitController.text,
                   );
                   Navigator.pop(context);
                 }
@@ -92,5 +140,14 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _goalController.dispose();
+    _detailController.dispose(); // ใช้ชื่อที่ถูกต้อง
+    _unitController.dispose();
+    super.dispose();
   }
 }
