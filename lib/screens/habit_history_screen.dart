@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../models/habit.dart';
 import '../models/habit_history.dart';
 import '../providers/habit_provider.dart';
+import '../screens/add_habit_screen.dart';
+import '../screens/home_screen.dart';
 import 'package:intl/intl.dart';
 
 class HabitHistoryScreen extends StatefulWidget {
@@ -13,7 +15,7 @@ class HabitHistoryScreen extends StatefulWidget {
 class _HabitHistoryScreenState extends State<HabitHistoryScreen> {
   DateTime selectedMonth = DateTime.now();
   Map<int, List<HabitHistory>> allHistories = {};
-
+  int _selectedIndex = 2; 
   @override
   void initState() {
     super.initState();
@@ -31,6 +33,34 @@ class _HabitHistoryScreenState extends State<HabitHistoryScreen> {
     setState(() {
       allHistories = histories;
     });
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    if (index == 0) {
+      
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+        (route) => false,  
+      );
+    } else if (index == 1) {
+      
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => AddHabitScreen()),
+      ).then((_) {
+        
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+          (route) => false,
+        );
+      });
+    }
+    
   }
 
   @override
@@ -86,12 +116,13 @@ class _HabitHistoryScreenState extends State<HabitHistoryScreen> {
                     SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: ['SUN', 'MON', 'TUE', 'WEN', 'TUS', 'FRI', 'SAT']
-                          .map((day) => Text(
-                                day,
-                                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                              ))
-                          .toList(),
+                      children: [
+                        for (int i = 0; i < 7; i++)
+                          Text(
+                            DateFormat('E').format(DateTime(2025, 1, 4 + i)).substring(0, 3),
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                      ],
                     ),
                     SizedBox(height: 10),
                     ...habits.asMap().entries.map((entry) {
@@ -185,7 +216,6 @@ class _HabitHistoryScreenState extends State<HabitHistoryScreen> {
                               ),
                             ),
                           ),
-                          // เพิ่มเส้นแบ่งระหว่าง Habit (ยกเว้น Habit สุดท้าย)
                           if (index < habits.length - 1)
                             Divider(
                               color: Colors.grey[700],
@@ -229,6 +259,38 @@ class _HabitHistoryScreenState extends State<HabitHistoryScreen> {
                 ),
               ),
             ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.grey[900],
+        selectedItemColor: Colors.blue,
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.add,
+                color: Colors.white,
+                size: 30,
+              ),
+            ),
+            label: 'Add',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'History',
+          ),
+        ],
+      ),
     );
   }
 

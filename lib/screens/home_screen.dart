@@ -19,15 +19,25 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedIndex = index;
     });
     if (index == 1) {
+    
+      Navigator.pushNamed(context, '/add-habit').then((_) {
+        Provider.of<HabitProvider>(context, listen: false).fetchHabits();
+        setState(() {
+          _selectedIndex = 0; 
+        });
+      });
+    } else if (index == 2) {
+
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => HabitHistoryScreen()),
       ).then((_) {
         setState(() {
-          _selectedIndex = 0;
+          _selectedIndex = 0; 
         });
       });
     }
+    
   }
 
   @override
@@ -63,13 +73,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Navigator.pushNamed(context, '/add-habit');
-          habitProvider.fetchHabits();
-        },
-        child: Icon(Icons.add),
-      ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.grey[900],
         selectedItemColor: Colors.blue,
@@ -80,6 +83,21 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.blue, 
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.add,
+                color: Colors.white,
+                size: 30, 
+              ),
+            ),
+            label: 'Add',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.history),

@@ -11,7 +11,6 @@ class HabitTile extends StatelessWidget {
 
   HabitTile({required this.habit, required this.selectedDate});
 
-  // ฟังก์ชันแปลง String เป็น IconData
   IconData _getIconData(String iconName) {
     switch (iconName) {
       case 'water_drop':
@@ -49,7 +48,7 @@ class HabitTile extends StatelessWidget {
               SizedBox(width: 16),
               Text(
                 habit.name,
-                style: TextStyle(color: Colors.white),  // เปลี่ยนเป็นสีขาว
+                style: TextStyle(color: Colors.white),  
               ),
             ],
           );
@@ -59,10 +58,9 @@ class HabitTile extends StatelessWidget {
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // เปลี่ยนสีของ Icon ให้เป็นสีขาว
             Icon(
               _getIconData(habit.icon),
-              color: Colors.white,  // เปลี่ยนเป็นสีขาว
+              color: Colors.white, 
               size: 40,
             ),
             SizedBox(width: 16),
@@ -70,11 +68,10 @@ class HabitTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // เปลี่ยนสีตัวหนังสือให้เป็นสีขาว
                   Text(
                     habit.name,
                     style: TextStyle(
-                      color: Colors.white,  // เปลี่ยนเป็นสีขาว
+                      color: Colors.white, 
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -83,7 +80,7 @@ class HabitTile extends StatelessWidget {
                   Text(
                     habit.detail,
                     style: TextStyle(
-                      color: Colors.white,  // เปลี่ยนเป็นสีขาว
+                      color: Colors.white,  
                       fontSize: 14,
                     ),
                   ),
@@ -91,7 +88,7 @@ class HabitTile extends StatelessWidget {
                   Text(
                     'Goal: ${habit.goal} ${habit.unit} (Current: ${progress.toStringAsFixed(1)})',
                     style: TextStyle(
-                      color: Colors.white,  // เปลี่ยนเป็นสีขาว
+                      color: Colors.white,  
                       fontSize: 14,
                     ),
                   ),

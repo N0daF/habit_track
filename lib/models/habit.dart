@@ -5,7 +5,7 @@ class Habit {
   double goal;
   String detail;
   String unit;
-  String icon; // เพิ่มฟิลด์ icon
+  String icon; 
 
   Habit({
     this.id,
@@ -14,7 +14,7 @@ class Habit {
     required this.goal,
     required this.detail,
     required this.unit,
-    required this.icon, // เพิ่มใน constructor
+    required this.icon, 
   });
 
   Map<String, dynamic> toMap() {
@@ -25,7 +25,7 @@ class Habit {
       'goal': goal,
       'detail': detail,
       'unit': unit,
-      'icon': icon, // เพิ่มใน toMap
+      'icon': icon, 
     };
   }
 
@@ -37,7 +37,6 @@ class Habit {
       goal: map['goal'],
       detail: map['detail'],
       unit: map['unit'],
-      icon: map['icon'], // เพิ่มใน fromMap
-    );
+      icon: map['icon'], 
   }
 }

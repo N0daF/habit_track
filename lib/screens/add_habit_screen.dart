@@ -13,7 +13,7 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
   final TextEditingController _detailController = TextEditingController();
   final TextEditingController _unitController = TextEditingController();
   Color _selectedColor = Colors.blue;
-  String _selectedIcon = 'check_circle'; // ไอคอนเริ่มต้น
+  String _selectedIcon = 'check_circle';
 
   final List<Map<String, dynamic>> _colors = [
     {'color': Colors.orange},
@@ -199,7 +199,7 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
                       goal,
                       _detailController.text,
                       _unitController.text,
-                      _selectedIcon, // ส่งค่า icon
+                      _selectedIcon, 
                     );
                     Navigator.pop(context);
                   } else {

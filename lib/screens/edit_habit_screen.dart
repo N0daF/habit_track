@@ -15,7 +15,8 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
   late TextEditingController _unitController;
   late Color _selectedColor;
   late String _selectedIcon;
-  late Habit habit; // เพิ่มตัวแปรเพื่อเก็บ Habit
+  late Habit habit; 
+
 
   final List<Map<String, dynamic>> _colors = [
     {'color': Colors.orange},
@@ -38,7 +39,7 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
   @override
   void initState() {
     super.initState();
-    // ไม่ดึงข้อมูลใน initState อีกต่อไป
+
     _nameController = TextEditingController();
     _goalController = TextEditingController();
     _detailController = TextEditingController();
@@ -48,9 +49,9 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // ดึงข้อมูล Habit จาก ModalRoute ใน didChangeDependencies
+ 
     habit = ModalRoute.of(context)!.settings.arguments as Habit;
-    // อัปเดตค่าใน TextEditingController และตัวแปรอื่น ๆ
+
     _nameController.text = habit.name;
     _goalController.text = habit.goal.toString();
     _detailController.text = habit.detail;

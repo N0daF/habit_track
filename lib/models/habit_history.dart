@@ -1,7 +1,7 @@
 class HabitHistory {
   final int? id;
   final int habitId;
-  final String date; // เก็บวันที่ในรูปแบบ "yyyy-MM-dd"
+  final String date; 
   final double progressAdded;
 
   HabitHistory({
