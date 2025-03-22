@@ -38,5 +38,6 @@ class Habit {
       detail: map['detail'],
       unit: map['unit'],
       icon: map['icon'], 
+    );
   }
 }
